@@ -3,7 +3,7 @@ import React from 'react';
 import { Container as BaseContainer } from '@usewaypoint/block-container';
 
 import { useCurrentBlockId } from '../../editor/EditorBlock';
-import { setDocument, setSelectedBlockId, useDocument } from '../../editor/EditorContext';
+import { deleteBlock, setDocument, setSelectedBlockId, useDocument } from '../../editor/EditorContext';
 import EditorChildrenIds from '../helpers/EditorChildrenIds';
 
 import { ContainerProps } from './ContainerPropsSchema';
@@ -30,6 +30,28 @@ export default function ContainerEditor({ style, props }: ContainerProps) {
             },
           });
           setSelectedBlockId(blockId);
+        }}
+        onReorder={(newChildrenIds) => {
+          setDocument({
+            [currentBlockId]: {
+              type: 'Container',
+              data: {
+                ...document[currentBlockId].data,
+                props: { childrenIds: newChildrenIds },
+              },
+            },
+          });
+        }}
+        onRemoveBlock={(blockId, newChildrenIds) => {
+          deleteBlock(blockId, {
+            [currentBlockId]: {
+              type: 'Container',
+              data: {
+                ...document[currentBlockId].data,
+                props: { childrenIds: newChildrenIds },
+              },
+            },
+          });
         }}
       />
     </BaseContainer>

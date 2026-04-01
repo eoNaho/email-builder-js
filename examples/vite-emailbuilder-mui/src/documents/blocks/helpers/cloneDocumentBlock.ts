@@ -27,6 +27,12 @@ function cloneBlock(document: TEditorConfiguration, blockId: string): TEditorBlo
     case 'Image':
     case 'Spacer':
     case 'Text':
+    case 'Accordion':
+    case 'Countdown':
+    case 'LogoGrid':
+    case 'Rating':
+    case 'ProgressBar':
+    case 'Testimonial':
       return clone;
     case 'Container':
       if (clone.data?.props?.childrenIds) {
@@ -39,6 +45,17 @@ function cloneBlock(document: TEditorConfiguration, blockId: string): TEditorBlo
         clone.data.props.columns[1].childrenIds = cloneChildrenIds(document, clone.data.props.columns[1].childrenIds);
         clone.data.props.columns[2].childrenIds = cloneChildrenIds(document, clone.data.props.columns[2].childrenIds);
       }
+      return clone;
+    case 'Row': {
+      const rowData = clone.data as { props?: { columns?: { childrenIds: string[] }[] } };
+      if (rowData.props?.columns) {
+        for (const col of rowData.props.columns) {
+          col.childrenIds = cloneChildrenIds(document, col.childrenIds);
+        }
+      }
+      return clone;
+    }
+    default:
       return clone;
   }
 }

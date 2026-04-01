@@ -5,14 +5,16 @@ import { Box, Menu } from '@mui/material';
 import { TEditorBlock } from '../../../../editor/core';
 
 import BlockButton from './BlockButton';
-import { BUTTONS } from './buttons';
+import { CONTENT_BUTTONS, ROW_BUTTONS } from './buttons';
 
 type BlocksMenuProps = {
   anchorEl: HTMLElement | null;
   setAnchorEl: (v: HTMLElement | null) => void;
   onSelect: (block: TEditorBlock) => void;
+  mode?: 'rows-only' | 'content-only' | 'all';
 };
-export default function BlocksMenu({ anchorEl, setAnchorEl, onSelect }: BlocksMenuProps) {
+export default function BlocksMenu({ anchorEl, setAnchorEl, onSelect, mode = 'all' }: BlocksMenuProps) {
+  const buttons = mode === 'rows-only' ? ROW_BUTTONS : mode === 'content-only' ? CONTENT_BUTTONS : [...ROW_BUTTONS, ...CONTENT_BUTTONS];
   const onClose = () => {
     setAnchorEl(null);
   };
@@ -35,7 +37,7 @@ export default function BlocksMenu({ anchorEl, setAnchorEl, onSelect }: BlocksMe
       transformOrigin={{ vertical: 'top', horizontal: 'center' }}
     >
       <Box sx={{ p: 1, display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr' }}>
-        {BUTTONS.map((k, i) => (
+        {buttons.map((k, i) => (
           <BlockButton key={i} label={k.label} icon={k.icon} onClick={() => onClick(k.block())} />
         ))}
       </Box>

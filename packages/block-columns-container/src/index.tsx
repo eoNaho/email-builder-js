@@ -17,10 +17,8 @@ const PADDING_SCHEMA = z
   .optional()
   .nullable();
 
-const FIXED_WIDTHS_SCHEMA = z
-  .tuple([z.number().nullish(), z.number().nullish(), z.number().nullish()])
-  .optional()
-  .nullable();
+// Array instead of tuple for backwards-compatibility and 4-column support
+const FIXED_WIDTHS_SCHEMA = z.array(z.number().nullish()).optional().nullable();
 
 const getPadding = (padding: z.infer<typeof PADDING_SCHEMA>) =>
   padding ? `${padding.top}px ${padding.right}px ${padding.bottom}px ${padding.left}px` : undefined;
@@ -37,7 +35,7 @@ export const ColumnsContainerPropsSchema = z.object({
     .object({
       fixedWidths: FIXED_WIDTHS_SCHEMA,
       columnsCount: z
-        .union([z.literal(2), z.literal(3)])
+        .union([z.literal(2), z.literal(3), z.literal(4)])
         .optional()
         .nullable(),
       columnsGap: z.number().optional().nullable(),
@@ -85,6 +83,7 @@ export function ColumnsContainer({ style, columns, props }: ColumnsContainerProp
             <TableCell index={0} props={blockProps} columns={columns} />
             <TableCell index={1} props={blockProps} columns={columns} />
             <TableCell index={2} props={blockProps} columns={columns} />
+            <TableCell index={3} props={blockProps} columns={columns} />
           </tr>
         </tbody>
       </table>
@@ -95,7 +94,7 @@ export function ColumnsContainer({ style, columns, props }: ColumnsContainerProp
 type Props = {
   props: {
     fixedWidths: z.infer<typeof FIXED_WIDTHS_SCHEMA>;
-    columnsCount: 2 | 3;
+    columnsCount: 2 | 3 | 4;
     columnsGap: number;
     contentAlignment: 'top' | 'middle' | 'bottom';
   };
@@ -106,7 +105,7 @@ function TableCell({ index, props, columns }: Props) {
   const contentAlignment = props?.contentAlignment ?? ColumnsContainerPropsDefaults.contentAlignment;
   const columnsCount = props?.columnsCount ?? ColumnsContainerPropsDefaults.columnsCount;
 
-  if (columnsCount === 2 && index === 2) {
+  if (index >= columnsCount) {
     return null;
   }
 
@@ -122,31 +121,12 @@ function TableCell({ index, props, columns }: Props) {
 }
 
 function getPaddingBefore(index: number, { columnsGap, columnsCount }: Props['props']) {
-  if (index === 0) {
-    return 0;
-  }
-  if (columnsCount === 2) {
-    return columnsGap / 2;
-  }
-  if (index === 1) {
-    return columnsGap / 3;
-  }
-  return (2 * columnsGap) / 3;
+  if (index === 0) return 0;
+  // Equal split: gap / columnsCount per side
+  return columnsGap / columnsCount;
 }
 
 function getPaddingAfter(index: number, { columnsGap, columnsCount }: Props['props']) {
-  if (columnsCount === 2) {
-    if (index === 0) {
-      return columnsGap / 2;
-    }
-    return 0;
-  }
-
-  if (index === 0) {
-    return (2 * columnsGap) / 3;
-  }
-  if (index === 1) {
-    return columnsGap / 3;
-  }
-  return 0;
+  if (index === columnsCount - 1) return 0;
+  return columnsGap / columnsCount;
 }

@@ -1,18 +1,7 @@
 import React, { CSSProperties } from 'react';
 import { z } from 'zod';
 
-const PADDING_SCHEMA = z
-  .object({
-    top: z.number(),
-    bottom: z.number(),
-    right: z.number(),
-    left: z.number(),
-  })
-  .optional()
-  .nullable();
-
-const getPadding = (padding: z.infer<typeof PADDING_SCHEMA>) =>
-  padding ? `${padding.top}px ${padding.right}px ${padding.bottom}px ${padding.left}px` : undefined;
+import { MOBILE_OVERRIDES_SCHEMA, PADDING_SCHEMA, VISIBILITY_SCHEMA, getPadding } from '@usewaypoint/document-core';
 
 export const AvatarPropsSchema = z.object({
   style: z
@@ -31,6 +20,8 @@ export const AvatarPropsSchema = z.object({
     })
     .optional()
     .nullable(),
+  visibility: VISIBILITY_SCHEMA,
+  mobileOverrides: MOBILE_OVERRIDES_SCHEMA,
 });
 
 export type AvatarProps = z.infer<typeof AvatarPropsSchema>;

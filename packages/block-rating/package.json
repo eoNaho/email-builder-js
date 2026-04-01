@@ -1,0 +1,21 @@
+{
+  "name": "@usewaypoint/block-rating",
+  "version": "1.0.0",
+  "main": "dist/index.js",
+  "module": "dist/index.mjs",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsup ./src/index.tsx --outDir dist --format cjs,esm --dts"
+  },
+  "peerDependencies": {
+    "react": "^18.0.0",
+    "zod": "^3.0.0"
+  },
+  "devDependencies": {
+    "tsup": "^8.0.0",
+    "typescript": "^5.0.0"
+  },
+  "dependencies": {
+    "@usewaypoint/document-core": "*"
+  }
+}

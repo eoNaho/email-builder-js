@@ -6,6 +6,8 @@ import { TextProps, TextPropsSchema } from '@usewaypoint/block-text';
 import BaseSidebarPanel from './helpers/BaseSidebarPanel';
 import BooleanInput from './helpers/inputs/BooleanInput';
 import TextInput from './helpers/inputs/TextInput';
+import MobileOverridesInput from './helpers/inputs/MobileOverridesInput';
+import VisibilityInput from './helpers/inputs/VisibilityInput';
 import MultiStylePropertyPanel from './helpers/style-inputs/MultiStylePropertyPanel';
 
 type TextSidebarPanelProps = {
@@ -40,9 +42,18 @@ export default function TextSidebarPanel({ data, setData }: TextSidebarPanelProp
       />
 
       <MultiStylePropertyPanel
-        names={['color', 'backgroundColor', 'fontFamily', 'fontSize', 'fontWeight', 'textAlign', 'padding']}
+        names={['color', 'backgroundColor', 'fontFamily', 'fontSize', 'fontWeight', 'lineHeight', 'letterSpacing', 'textAlign', 'padding']}
         value={data.style}
         onChange={(style) => updateData({ ...data, style })}
+      />
+      <VisibilityInput
+        defaultValue={data.visibility}
+        onChange={(visibility) => updateData({ ...data, visibility })}
+      />
+      <MobileOverridesInput
+        defaultValue={data.mobileOverrides ?? {}}
+        onChange={(mobileOverrides) => updateData({ ...data, mobileOverrides })}
+        fields={['padding', 'fontSize', 'textAlign']}
       />
     </BaseSidebarPanel>
   );

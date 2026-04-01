@@ -21,21 +21,32 @@
   "author": "carlos@usewaypoint.com",
   "license": "MIT",
   "peerDependencies": {
-    "react": "^16 || ^17 || ^18",
-    "react-dom": "^16 || ^17 || ^18",
-    "zod": "^1 || ^2 || ^3"
+    "react": "^17 || ^18 || ^19",
+    "react-dom": "^17 || ^18 || ^19",
+    "zod": "^3.0.0"
   },
   "dependencies": {
+    "@usewaypoint/block-accordion": "*",
     "@usewaypoint/block-avatar": "^0.0.3",
+    "@usewaypoint/block-countdown": "*",
+    "@usewaypoint/block-logo-grid": "*",
     "@usewaypoint/block-button": "^0.0.3",
     "@usewaypoint/block-columns-container": "^0.0.3",
     "@usewaypoint/block-container": "^0.0.2",
     "@usewaypoint/block-divider": "^0.0.4",
+    "@usewaypoint/block-footer": "^0.0.1",
     "@usewaypoint/block-heading": "^0.0.3",
     "@usewaypoint/block-html": "^0.0.3",
     "@usewaypoint/block-image": "^0.0.5",
+    "@usewaypoint/block-navigation": "^0.0.1",
+    "@usewaypoint/block-row": "^0.0.1",
+    "@usewaypoint/block-progress-bar": "*",
+    "@usewaypoint/block-rating": "*",
+    "@usewaypoint/block-social": "^0.0.1",
     "@usewaypoint/block-spacer": "^0.0.3",
+    "@usewaypoint/block-testimonial": "*",
     "@usewaypoint/block-text": "^0.0.7",
+    "@usewaypoint/block-video": "^0.0.1",
     "@usewaypoint/document-core": "^0.0.6"
   }
 }

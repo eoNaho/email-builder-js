@@ -17,6 +17,7 @@ import BaseSidebarPanel from './helpers/BaseSidebarPanel';
 import ColumnWidthsInput from './helpers/inputs/ColumnWidthsInput';
 import RadioGroupInput from './helpers/inputs/RadioGroupInput';
 import SliderInput from './helpers/inputs/SliderInput';
+import VisibilityInput from './helpers/inputs/VisibilityInput';
 import MultiStylePropertyPanel from './helpers/style-inputs/MultiStylePropertyPanel';
 
 type ColumnsContainerPanelProps = {
@@ -39,16 +40,24 @@ export default function ColumnsContainerPanel({ data, setData }: ColumnsContaine
     <BaseSidebarPanel title="Columns block">
       <RadioGroupInput
         label="Number of columns"
-        defaultValue={data.props?.columnsCount === 2 ? '2' : '3'}
+        defaultValue={String(data.props?.columnsCount ?? 2)}
         onChange={(v) => {
-          updateData({ ...data, props: { ...data.props, columnsCount: v === '2' ? 2 : 3 } });
+          const count = parseInt(v, 10) as 2 | 3 | 4;
+          const existingCols = data.props?.columns ?? [];
+          const emptyCol = { childrenIds: [] };
+          const columns =
+            count > existingCols.length
+              ? [...existingCols, ...Array(count - existingCols.length).fill(emptyCol)]
+              : existingCols.slice(0, count);
+          updateData({ ...data, props: { ...data.props, columnsCount: count, columns } });
         }}
       >
         <ToggleButton value="2">2</ToggleButton>
         <ToggleButton value="3">3</ToggleButton>
+        <ToggleButton value="4">4</ToggleButton>
       </RadioGroupInput>
       <ColumnWidthsInput
-        defaultValue={data.props?.fixedWidths}
+        defaultValue={data.props?.fixedWidths as [number | null | undefined, number | null | undefined, number | null | undefined] | null | undefined}
         onChange={(fixedWidths) => {
           updateData({ ...data, props: { ...data.props, fixedWidths } });
         }}
@@ -86,6 +95,10 @@ export default function ColumnsContainerPanel({ data, setData }: ColumnsContaine
         names={['backgroundColor', 'padding']}
         value={data.style}
         onChange={(style) => updateData({ ...data, style })}
+      />
+      <VisibilityInput
+        defaultValue={data.visibility}
+        onChange={(visibility) => updateData({ ...data, visibility })}
       />
     </BaseSidebarPanel>
   );

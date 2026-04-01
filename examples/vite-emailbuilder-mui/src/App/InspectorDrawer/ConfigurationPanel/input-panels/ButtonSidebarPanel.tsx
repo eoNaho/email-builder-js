@@ -6,8 +6,10 @@ import { ButtonProps, ButtonPropsDefaults, ButtonPropsSchema } from '@usewaypoin
 
 import BaseSidebarPanel from './helpers/BaseSidebarPanel';
 import ColorInput from './helpers/inputs/ColorInput';
+import LinkInput from './helpers/inputs/LinkInput';
 import RadioGroupInput from './helpers/inputs/RadioGroupInput';
 import TextInput from './helpers/inputs/TextInput';
+import VisibilityInput from './helpers/inputs/VisibilityInput';
 import MultiStylePropertyPanel from './helpers/style-inputs/MultiStylePropertyPanel';
 
 type ButtonSidebarPanelProps = {
@@ -42,8 +44,8 @@ export default function ButtonSidebarPanel({ data, setData }: ButtonSidebarPanel
         defaultValue={text}
         onChange={(text) => updateData({ ...data, props: { ...data.props, text } })}
       />
-      <TextInput
-        label="Url"
+      <LinkInput
+        label="URL"
         defaultValue={url}
         onChange={(url) => updateData({ ...data, props: { ...data.props, url } })}
       />
@@ -88,6 +90,10 @@ export default function ButtonSidebarPanel({ data, setData }: ButtonSidebarPanel
         names={['backgroundColor', 'fontFamily', 'fontSize', 'fontWeight', 'textAlign', 'padding']}
         value={data.style}
         onChange={(style) => updateData({ ...data, style })}
+      />
+      <VisibilityInput
+        defaultValue={data.visibility}
+        onChange={(visibility) => updateData({ ...data, visibility })}
       />
     </BaseSidebarPanel>
   );

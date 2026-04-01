@@ -1,6 +1,7 @@
 import { z } from 'zod';
 
 import { ContainerPropsSchema as BaseContainerPropsSchema } from '@usewaypoint/block-container';
+import { VISIBILITY_SCHEMA } from '@usewaypoint/document-core';
 
 const ContainerPropsSchema = z.object({
   style: BaseContainerPropsSchema.shape.style,
@@ -10,6 +11,7 @@ const ContainerPropsSchema = z.object({
     })
     .optional()
     .nullable(),
+  visibility: VISIBILITY_SCHEMA,
 });
 
 export default ContainerPropsSchema;

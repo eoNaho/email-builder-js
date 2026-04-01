@@ -1,7 +1,7 @@
 import React from 'react';
 
 import { useCurrentBlockId } from '../../editor/EditorBlock';
-import { setDocument, setSelectedBlockId, useDocument } from '../../editor/EditorContext';
+import { deleteBlock, setDocument, setSelectedBlockId, useDocument } from '../../editor/EditorContext';
 import EditorChildrenIds from '../helpers/EditorChildrenIds';
 
 import { EmailLayoutProps } from './EmailLayoutPropsSchema';
@@ -80,6 +80,7 @@ export default function EmailLayoutEditor(props: EmailLayoutProps) {
             <td>
               <EditorChildrenIds
                 childrenIds={childrenIds}
+                mode="rows-only"
                 onChange={({ block, blockId, childrenIds }) => {
                   setDocument({
                     [blockId]: block,
@@ -92,6 +93,28 @@ export default function EmailLayoutEditor(props: EmailLayoutProps) {
                     },
                   });
                   setSelectedBlockId(blockId);
+                }}
+                onReorder={(newChildrenIds) => {
+                  setDocument({
+                    [currentBlockId]: {
+                      type: 'EmailLayout',
+                      data: {
+                        ...document[currentBlockId].data,
+                        childrenIds: newChildrenIds,
+                      },
+                    },
+                  });
+                }}
+                onRemoveBlock={(blockId, newChildrenIds) => {
+                  deleteBlock(blockId, {
+                    [currentBlockId]: {
+                      type: 'EmailLayout',
+                      data: {
+                        ...document[currentBlockId].data,
+                        childrenIds: newChildrenIds,
+                      },
+                    },
+                  });
                 }}
               />
             </td>

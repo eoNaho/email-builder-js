@@ -40,6 +40,16 @@ function findParentBlockId(blockId: string, document: TEditorConfiguration) {
           return id;
         }
         break;
+      case 'Row':
+        if ((block.data as { props?: { columns?: { childrenIds: string[] }[] } }).props?.columns?.some((col) => col.childrenIds?.includes(blockId))) {
+          return id;
+        }
+        break;
+      case 'Conditional':
+        if ((block.data as { props?: { childrenIds?: string[] } }).props?.childrenIds?.includes(blockId)) {
+          return id;
+        }
+        break;
     }
   }
   return null;
@@ -90,6 +100,29 @@ export default function TuneMenu({ blockId }: Props) {
             }
           }
           break;
+        case 'Row': {
+          const rowData = parentBlock.data as { props?: { columns?: { childrenIds: string[] }[] } };
+          if (!rowData.props) {
+            (parentBlock.data as { props: { columns: { childrenIds: string[] }[] } }).props = { columns: [{ childrenIds: [] }] };
+          }
+          for (const column of rowData.props?.columns ?? []) {
+            if (column.childrenIds.includes(blockId)) {
+              const index = column.childrenIds.indexOf(blockId);
+              column.childrenIds.splice(index + 1, 0, newBlockId);
+            }
+          }
+          break;
+        }
+        case 'Conditional': {
+          const condData = parentBlock.data as { props?: { childrenIds?: string[] } };
+          if (!condData.props) {
+            (parentBlock.data as { props: { childrenIds: string[] } }).props = { childrenIds: [] };
+          }
+          const condChildren = condData.props?.childrenIds ?? [];
+          const index = condChildren.indexOf(blockId);
+          if (index >= 0) condChildren.splice(index + 1, 0, newBlockId);
+          break;
+        }
       }
 
       resetDocument(newDocument);
@@ -147,6 +180,36 @@ export default function TuneMenu({ blockId }: Props) {
             } as ColumnsContainerProps,
           };
           break;
+        case 'Row': {
+          const rowData = block.data as { style?: unknown; props?: { columns?: { childrenIds: string[] }[] } & Record<string, unknown> };
+          nDocument[id] = {
+            type: 'Row',
+            data: {
+              style: rowData.style,
+              props: {
+                ...rowData.props,
+                columns: rowData.props?.columns?.map((c) => ({
+                  childrenIds: filterChildrenIds(c.childrenIds) ?? [],
+                })),
+              },
+            },
+          } as TEditorBlock;
+          break;
+        }
+        case 'Conditional': {
+          const condData = block.data as { props?: { childrenIds?: string[] } };
+          nDocument[id] = {
+            type: 'Conditional',
+            data: {
+              ...block.data,
+              props: {
+                ...condData.props,
+                childrenIds: filterChildrenIds(condData.props?.childrenIds),
+              },
+            },
+          } as TEditorBlock;
+          break;
+        }
         default:
           nDocument[id] = block;
       }
@@ -217,6 +280,36 @@ export default function TuneMenu({ blockId }: Props) {
             } as ColumnsContainerProps,
           };
           break;
+        case 'Row': {
+          const rowData = block.data as { style?: unknown; props?: { columns?: { childrenIds: string[] }[] } & Record<string, unknown> };
+          nDocument[id] = {
+            type: 'Row',
+            data: {
+              style: rowData.style,
+              props: {
+                ...rowData.props,
+                columns: rowData.props?.columns?.map((c) => ({
+                  childrenIds: moveChildrenIds(c.childrenIds) ?? [],
+                })),
+              },
+            },
+          } as TEditorBlock;
+          break;
+        }
+        case 'Conditional': {
+          const condData = block.data as { props?: { childrenIds?: string[] } };
+          nDocument[id] = {
+            type: 'Conditional',
+            data: {
+              ...block.data,
+              props: {
+                ...condData.props,
+                childrenIds: moveChildrenIds(condData.props?.childrenIds),
+              },
+            },
+          } as TEditorBlock;
+          break;
+        }
         default:
           nDocument[id] = block;
       }

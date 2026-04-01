@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { Box, Button, SxProps, Typography } from '@mui/material';
+import { Box, Typography } from '@mui/material';
 
 type BlockMenuButtonProps = {
   label: string;
@@ -8,29 +8,55 @@ type BlockMenuButtonProps = {
   onClick: () => void;
 };
 
-const BUTTON_SX: SxProps = { p: 1.5, display: 'flex', flexDirection: 'column' };
-const ICON_SX: SxProps = {
-  mb: 0.75,
-  width: '100%',
-  bgcolor: 'cadet.200',
-  display: 'flex',
-  justifyContent: 'center',
-  p: 1,
-  border: '1px solid',
-  borderColor: 'cadet.300',
-};
-
 export default function BlockTypeButton({ label, icon, onClick }: BlockMenuButtonProps) {
   return (
-    <Button
-      sx={BUTTON_SX}
-      onClick={(ev) => {
+    <Box
+      component="button"
+      onClick={(ev: React.MouseEvent) => {
         ev.stopPropagation();
         onClick();
       }}
+      sx={{
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        gap: 1,
+        p: 2,
+        bgcolor: 'white',
+        border: '1px solid',
+        borderColor: 'divider',
+        borderRadius: 1.5,
+        cursor: 'pointer',
+        width: '100%',
+        outline: 'none',
+        transition: 'border-color 0.15s, box-shadow 0.15s',
+        '&:hover': {
+          borderColor: 'primary.main',
+          boxShadow: '0 1px 4px rgba(0,0,0,0.1)',
+          '& .block-icon': { color: 'primary.main' },
+          '& .block-label': { color: 'primary.main' },
+        },
+      }}
     >
-      <Box sx={ICON_SX}>{icon}</Box>
-      <Typography variant="body2">{label}</Typography>
-    </Button>
+      <Box className="block-icon" sx={{ display: 'flex', fontSize: 20, color: '#94a3b8', transition: 'color 0.15s' }}>
+        {icon}
+      </Box>
+      <Typography
+        className="block-label"
+        sx={{
+          fontSize: 11,
+          fontWeight: 500,
+          lineHeight: 1,
+          textTransform: 'none',
+          letterSpacing: 0,
+          textAlign: 'center',
+          color: 'text.secondary',
+          transition: 'color 0.15s',
+        }}
+      >
+        {label}
+      </Typography>
+    </Box>
   );
 }

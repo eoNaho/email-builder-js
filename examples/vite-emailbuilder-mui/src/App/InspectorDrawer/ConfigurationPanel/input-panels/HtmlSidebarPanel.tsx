@@ -5,6 +5,7 @@ import { HtmlProps, HtmlPropsSchema } from '@usewaypoint/block-html';
 
 import BaseSidebarPanel from './helpers/BaseSidebarPanel';
 import TextInput from './helpers/inputs/TextInput';
+import VisibilityInput from './helpers/inputs/VisibilityInput';
 import MultiStylePropertyPanel from './helpers/style-inputs/MultiStylePropertyPanel';
 
 type HtmlSidebarPanelProps = {
@@ -36,6 +37,10 @@ export default function HtmlSidebarPanel({ data, setData }: HtmlSidebarPanelProp
         names={['color', 'backgroundColor', 'fontFamily', 'fontSize', 'textAlign', 'padding']}
         value={data.style}
         onChange={(style) => updateData({ ...data, style })}
+      />
+      <VisibilityInput
+        defaultValue={data.visibility}
+        onChange={(visibility) => updateData({ ...data, visibility })}
       />
     </BaseSidebarPanel>
   );

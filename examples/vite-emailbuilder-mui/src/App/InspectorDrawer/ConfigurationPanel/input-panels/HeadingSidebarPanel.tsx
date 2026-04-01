@@ -7,6 +7,8 @@ import { HeadingProps, HeadingPropsDefaults, HeadingPropsSchema } from '@usewayp
 import BaseSidebarPanel from './helpers/BaseSidebarPanel';
 import RadioGroupInput from './helpers/inputs/RadioGroupInput';
 import TextInput from './helpers/inputs/TextInput';
+import MobileOverridesInput from './helpers/inputs/MobileOverridesInput';
+import VisibilityInput from './helpers/inputs/VisibilityInput';
 import MultiStylePropertyPanel from './helpers/style-inputs/MultiStylePropertyPanel';
 
 type HeadingSidebarPanelProps = {
@@ -48,9 +50,18 @@ export default function HeadingSidebarPanel({ data, setData }: HeadingSidebarPan
         <ToggleButton value="h3">H3</ToggleButton>
       </RadioGroupInput>
       <MultiStylePropertyPanel
-        names={['color', 'backgroundColor', 'fontFamily', 'fontWeight', 'textAlign', 'padding']}
+        names={['color', 'backgroundColor', 'fontFamily', 'fontWeight', 'lineHeight', 'letterSpacing', 'textAlign', 'padding']}
         value={data.style}
         onChange={(style) => updateData({ ...data, style })}
+      />
+      <VisibilityInput
+        defaultValue={data.visibility}
+        onChange={(visibility) => updateData({ ...data, visibility })}
+      />
+      <MobileOverridesInput
+        defaultValue={data.mobileOverrides ?? {}}
+        onChange={(mobileOverrides) => updateData({ ...data, mobileOverrides })}
+        fields={['fontSize', 'textAlign']}
       />
     </BaseSidebarPanel>
   );

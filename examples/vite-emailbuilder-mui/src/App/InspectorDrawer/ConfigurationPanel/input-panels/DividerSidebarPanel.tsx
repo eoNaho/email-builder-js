@@ -7,6 +7,7 @@ import { DividerProps, DividerPropsDefaults, DividerPropsSchema } from '@usewayp
 import BaseSidebarPanel from './helpers/BaseSidebarPanel';
 import ColorInput from './helpers/inputs/ColorInput';
 import SliderInput from './helpers/inputs/SliderInput';
+import VisibilityInput from './helpers/inputs/VisibilityInput';
 import MultiStylePropertyPanel from './helpers/style-inputs/MultiStylePropertyPanel';
 
 type DividerSidebarPanelProps = {
@@ -49,6 +50,10 @@ export default function DividerSidebarPanel({ data, setData }: DividerSidebarPan
         names={['backgroundColor', 'padding']}
         value={data.style}
         onChange={(style) => updateData({ ...data, style })}
+      />
+      <VisibilityInput
+        defaultValue={data.visibility}
+        onChange={(visibility) => updateData({ ...data, visibility })}
       />
     </BaseSidebarPanel>
   );

@@ -6,6 +6,7 @@ import { SpacerProps, SpacerPropsDefaults, SpacerPropsSchema } from '@usewaypoin
 
 import BaseSidebarPanel from './helpers/BaseSidebarPanel';
 import SliderInput from './helpers/inputs/SliderInput';
+import VisibilityInput from './helpers/inputs/VisibilityInput';
 
 type SpacerSidebarPanelProps = {
   data: SpacerProps;
@@ -35,6 +36,10 @@ export default function SpacerSidebarPanel({ data, setData }: SpacerSidebarPanel
         max={128}
         defaultValue={data.props?.height ?? SpacerPropsDefaults.height}
         onChange={(height) => updateData({ ...data, props: { ...data.props, height } })}
+      />
+      <VisibilityInput
+        defaultValue={data.visibility}
+        onChange={(visibility) => updateData({ ...data, visibility })}
       />
     </BaseSidebarPanel>
   );

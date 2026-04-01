@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { RoundedCornerOutlined } from '@mui/icons-material';
+import { FormatLineSpacingOutlined, RoundedCornerOutlined, SpaceBarOutlined } from '@mui/icons-material';
 
 import { TStyle } from '../../../../../../documents/blocks/helpers/TStyle';
 import { NullableColorInput } from '../inputs/ColorInput';
@@ -54,5 +54,31 @@ export default function SingleStylePropertyPanel({ name, value, onChange }: Styl
       return <TextAlignInput label="Alignment" defaultValue={defaultValue} onChange={handleChange} />;
     case 'padding':
       return <PaddingInput label="Padding" defaultValue={defaultValue} onChange={handleChange} />;
+    case 'lineHeight':
+      return (
+        <SliderInput
+          iconLabel={<FormatLineSpacingOutlined />}
+          label="Line height"
+          units=""
+          step={0.1}
+          min={1}
+          max={3}
+          defaultValue={defaultValue ?? 1.5}
+          onChange={handleChange}
+        />
+      );
+    case 'letterSpacing':
+      return (
+        <SliderInput
+          iconLabel={<SpaceBarOutlined />}
+          label="Letter spacing"
+          units="px"
+          step={0.5}
+          min={-2}
+          max={10}
+          defaultValue={defaultValue ?? 0}
+          onChange={handleChange}
+        />
+      );
   }
 }

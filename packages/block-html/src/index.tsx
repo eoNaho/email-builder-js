@@ -1,63 +1,93 @@
+import insane from 'insane';
 import React, { CSSProperties } from 'react';
 import { z } from 'zod';
 
-const FONT_FAMILY_SCHEMA = z
-  .enum([
-    'MODERN_SANS',
-    'BOOK_SANS',
-    'ORGANIC_SANS',
-    'GEOMETRIC_SANS',
-    'HEAVY_SANS',
-    'ROUNDED_SANS',
-    'MODERN_SERIF',
-    'BOOK_SERIF',
-    'MONOSPACE',
-  ])
-  .nullable()
-  .optional();
+import { COLOR_SCHEMA, FONT_FAMILY_SCHEMA, MOBILE_OVERRIDES_SCHEMA, PADDING_SCHEMA, VISIBILITY_SCHEMA, getFontFamily, getPadding } from '@usewaypoint/document-core';
 
-function getFontFamily(fontFamily: z.infer<typeof FONT_FAMILY_SCHEMA>) {
-  switch (fontFamily) {
-    case 'MODERN_SANS':
-      return '"Helvetica Neue", "Arial Nova", "Nimbus Sans", Arial, sans-serif';
-    case 'BOOK_SANS':
-      return 'Optima, Candara, "Noto Sans", source-sans-pro, sans-serif';
-    case 'ORGANIC_SANS':
-      return 'Seravek, "Gill Sans Nova", Ubuntu, Calibri, "DejaVu Sans", source-sans-pro, sans-serif';
-    case 'GEOMETRIC_SANS':
-      return 'Avenir, "Avenir Next LT Pro", Montserrat, Corbel, "URW Gothic", source-sans-pro, sans-serif';
-    case 'HEAVY_SANS':
-      return 'Bahnschrift, "DIN Alternate", "Franklin Gothic Medium", "Nimbus Sans Narrow", sans-serif-condensed, sans-serif';
-    case 'ROUNDED_SANS':
-      return 'ui-rounded, "Hiragino Maru Gothic ProN", Quicksand, Comfortaa, Manjari, "Arial Rounded MT Bold", Calibri, source-sans-pro, sans-serif';
-    case 'MODERN_SERIF':
-      return 'Charter, "Bitstream Charter", "Sitka Text", Cambria, serif';
-    case 'BOOK_SERIF':
-      return '"Iowan Old Style", "Palatino Linotype", "URW Palladio L", P052, serif';
-    case 'MONOSPACE':
-      return '"Nimbus Mono PS", "Courier New", "Cutive Mono", monospace';
-  }
-  return undefined;
+// Cast to string[] because @types/insane has an incomplete AllowedTags union
+const HTML_ALLOWED_TAGS = [
+  'a',
+  'abbr',
+  'article',
+  'b',
+  'blockquote',
+  'br',
+  'caption',
+  'center',
+  'cite',
+  'code',
+  'col',
+  'colgroup',
+  'del',
+  'details',
+  'div',
+  'em',
+  'font',
+  'h1',
+  'h2',
+  'h3',
+  'h4',
+  'h5',
+  'h6',
+  'hr',
+  'i',
+  'img',
+  'ins',
+  'kbd',
+  'li',
+  'main',
+  'ol',
+  'p',
+  'pre',
+  'section',
+  'small',
+  'span',
+  'strong',
+  'sub',
+  'summary',
+  'sup',
+  'table',
+  'tbody',
+  'td',
+  'tfoot',
+  'th',
+  'thead',
+  'tr',
+  'u',
+  'ul',
+] as string[];
+
+const GENERIC_ATTRS = ['style', 'class', 'id', 'title', 'align', 'valign', 'width', 'height', 'bgcolor', 'color'];
+
+function sanitizeHtml(html: string): string {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return insane(html, {
+    allowedTags: HTML_ALLOWED_TAGS as any,
+    allowedSchemes: ['http', 'https', 'mailto'],
+    allowedAttributes: {
+      ...HTML_ALLOWED_TAGS.reduce<Record<string, string[]>>((res, tag) => {
+        res[tag] = [...GENERIC_ATTRS];
+        return res;
+      }, {}),
+      a: ['href', 'target', 'rel', ...GENERIC_ATTRS],
+      img: ['src', 'alt', 'border', ...GENERIC_ATTRS],
+      table: ['border', 'cellspacing', 'cellpadding', 'role', ...GENERIC_ATTRS],
+      td: ['colspan', 'rowspan', ...GENERIC_ATTRS],
+      th: ['colspan', 'rowspan', 'scope', ...GENERIC_ATTRS],
+      ol: ['start', 'type', ...GENERIC_ATTRS],
+      ul: ['type', ...GENERIC_ATTRS],
+    },
+    filter: (token) => {
+      if (token.tag === 'a' && 'href' in token.attrs && token.attrs.href === undefined) {
+        token.attrs.href = '';
+      }
+      if (token.tag === 'img' && 'src' in token.attrs && token.attrs.src === undefined) {
+        token.attrs.src = '';
+      }
+      return true;
+    },
+  });
 }
-
-const COLOR_SCHEMA = z
-  .string()
-  .regex(/^#[0-9a-fA-F]{6}$/)
-  .nullable()
-  .optional();
-
-const PADDING_SCHEMA = z
-  .object({
-    top: z.number(),
-    bottom: z.number(),
-    right: z.number(),
-    left: z.number(),
-  })
-  .optional()
-  .nullable();
-
-const getPadding = (padding: z.infer<typeof PADDING_SCHEMA>) =>
-  padding ? `${padding.top}px ${padding.right}px ${padding.bottom}px ${padding.left}px` : undefined;
 
 export const HtmlPropsSchema = z.object({
   style: z
@@ -74,15 +104,23 @@ export const HtmlPropsSchema = z.object({
   props: z
     .object({
       contents: z.string().optional().nullable(),
+      /**
+       * When true, HTML is rendered without sanitization.
+       * Only use this in trusted server-side contexts where the HTML
+       * source is controlled. Never set this to true for user-supplied content.
+       */
+      allowUnsanitized: z.boolean().optional().nullable(),
     })
     .optional()
     .nullable(),
+  visibility: VISIBILITY_SCHEMA,
+  mobileOverrides: MOBILE_OVERRIDES_SCHEMA,
 });
 
 export type HtmlProps = z.infer<typeof HtmlPropsSchema>;
 
 export function Html({ style, props }: HtmlProps) {
-  const children = props?.contents;
+  const contents = props?.contents;
   const cssStyle: CSSProperties = {
     color: style?.color ?? undefined,
     backgroundColor: style?.backgroundColor ?? undefined,
@@ -91,8 +129,9 @@ export function Html({ style, props }: HtmlProps) {
     textAlign: style?.textAlign ?? undefined,
     padding: getPadding(style?.padding),
   };
-  if (!children) {
+  if (!contents) {
     return <div style={cssStyle} />;
   }
-  return <div style={cssStyle} dangerouslySetInnerHTML={{ __html: children }} />;
+  const html = props?.allowUnsanitized ? contents : sanitizeHtml(contents);
+  return <div style={cssStyle} dangerouslySetInnerHTML={{ __html: html }} />;
 }

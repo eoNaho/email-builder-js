@@ -8,6 +8,8 @@ export type TStyle = {
   fontFamily?: any;
   fontSize?: any;
   fontWeight?: any;
+  lineHeight?: any;
+  letterSpacing?: any;
   padding?: any;
   textAlign?: any;
 };

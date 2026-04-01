@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { HexColorInput, HexColorPicker } from 'react-colorful';
 
-import { Box, Stack, SxProps } from '@mui/material';
+import { Box, Divider, Stack, SxProps, Typography } from '@mui/material';
 
+import { useBrandKit } from '../../../../../../../documents/editor/BrandKitContext';
 import Swatch from './Swatch';
 
 const DEFAULT_PRESET_COLORS = [
@@ -75,16 +76,32 @@ type Props = {
 };
 export default function Picker({ value, onChange }: Props) {
   const [internalValue, setInternalValue] = useState(value);
+  const { brandKit } = useBrandKit();
   const handleChange = (v: string) => {
     setInternalValue(v);
-    if (/^#[0-9a-fA-F]{6}$/.test(v)) {
+    // Accept hex6 (#RRGGBB) or hex8 (#RRGGBBAA)
+    if (/^#[0-9a-fA-F]{6}([0-9a-fA-F]{2})?$/.test(v)) {
       onChange(v);
     }
   };
 
+  const brandColors = [
+    brandKit.colors?.primary,
+    brandKit.colors?.secondary,
+    brandKit.colors?.accent,
+    ...(brandKit.colors?.neutral ?? []),
+  ].filter((c): c is string => typeof c === 'string' && c.length > 0);
+
   return (
     <Stack spacing={1} sx={SX}>
       <HexColorPicker color={value} onChange={handleChange} />
+      {brandColors.length > 0 && (
+        <>
+          <Typography variant="caption" color="text.secondary">Brand colors</Typography>
+          <Swatch paletteColors={brandColors} value={value} onChange={handleChange} />
+          <Divider />
+        </>
+      )}
       <Swatch paletteColors={DEFAULT_PRESET_COLORS} value={value} onChange={handleChange} />
       <Box pt={1}>
         <HexColorInput prefixed color={internalValue} onChange={handleChange} />

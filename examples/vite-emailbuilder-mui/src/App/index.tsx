@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 
 import { Stack, useTheme } from '@mui/material';
 
-import { useInspectorDrawerOpen, useSamplesDrawerOpen } from '../documents/editor/EditorContext';
+import { redo, undo, useDocument, useInspectorDrawerOpen, useSamplesDrawerOpen } from '../documents/editor/EditorContext';
+import { useCallbacks } from '../documents/editor/CallbacksContext';
 
 import InspectorDrawer, { INSPECTOR_DRAWER_WIDTH } from './InspectorDrawer';
 import SamplesDrawer, { SAMPLES_DRAWER_WIDTH } from './SamplesDrawer';
@@ -16,9 +17,53 @@ function useDrawerTransition(cssProperty: 'margin-left' | 'margin-right', open: 
   });
 }
 
+function useAutoSave() {
+  const document = useDocument();
+  const { onAutoSave } = useCallbacks();
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const isFirstRender = useRef(true);
+
+  useEffect(() => {
+    if (!onAutoSave) return;
+    if (isFirstRender.current) {
+      isFirstRender.current = false;
+      return;
+    }
+    if (timerRef.current) clearTimeout(timerRef.current);
+    timerRef.current = setTimeout(() => {
+      onAutoSave(document as Record<string, unknown>);
+    }, 2000);
+    return () => {
+      if (timerRef.current) clearTimeout(timerRef.current);
+    };
+  }, [document, onAutoSave]);
+}
+
+function useUndoRedoKeyboard() {
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      const target = e.target as HTMLElement;
+      if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable) {
+        return;
+      }
+      if ((e.ctrlKey || e.metaKey) && e.key === 'z' && !e.shiftKey) {
+        e.preventDefault();
+        undo();
+      } else if ((e.ctrlKey || e.metaKey) && (e.key === 'y' || (e.key === 'z' && e.shiftKey))) {
+        e.preventDefault();
+        redo();
+      }
+    };
+    document.addEventListener('keydown', handler);
+    return () => document.removeEventListener('keydown', handler);
+  }, []);
+}
+
 export default function App() {
   const inspectorDrawerOpen = useInspectorDrawerOpen();
   const samplesDrawerOpen = useSamplesDrawerOpen();
+  useUndoRedoKeyboard();
+  useAutoSave();
 
   const marginLeftTransition = useDrawerTransition('margin-left', samplesDrawerOpen);
   const marginRightTransition = useDrawerTransition('margin-right', inspectorDrawerOpen);

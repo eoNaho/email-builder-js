@@ -6,9 +6,11 @@ import { ToggleButton } from '@mui/material';
 import { AvatarProps, AvatarPropsDefaults, AvatarPropsSchema } from '@usewaypoint/block-avatar';
 
 import BaseSidebarPanel from './helpers/BaseSidebarPanel';
+import ImagePicker from './helpers/inputs/ImagePicker';
 import RadioGroupInput from './helpers/inputs/RadioGroupInput';
 import SliderInput from './helpers/inputs/SliderInput';
 import TextInput from './helpers/inputs/TextInput';
+import VisibilityInput from './helpers/inputs/VisibilityInput';
 import MultiStylePropertyPanel from './helpers/style-inputs/MultiStylePropertyPanel';
 
 type AvatarSidebarPanelProps = {
@@ -57,11 +59,11 @@ export default function AvatarSidebarPanel({ data, setData }: AvatarSidebarPanel
         <ToggleButton value="square">Square</ToggleButton>
         <ToggleButton value="rounded">Rounded</ToggleButton>
       </RadioGroupInput>
-      <TextInput
+      <ImagePicker
         label="Image URL"
         defaultValue={imageUrl}
-        onChange={(imageUrl) => {
-          updateData({ ...data, props: { ...data.props, imageUrl } });
+        onChange={(newUrl) => {
+          updateData({ ...data, props: { ...data.props, imageUrl: newUrl ?? '' } });
         }}
       />
       <TextInput
@@ -76,6 +78,10 @@ export default function AvatarSidebarPanel({ data, setData }: AvatarSidebarPanel
         names={['textAlign', 'padding']}
         value={data.style}
         onChange={(style) => updateData({ ...data, style })}
+      />
+      <VisibilityInput
+        defaultValue={data.visibility}
+        onChange={(visibility) => updateData({ ...data, visibility })}
       />
     </BaseSidebarPanel>
   );

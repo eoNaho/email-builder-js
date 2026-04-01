@@ -4,6 +4,7 @@ import type { ZodError } from 'zod';
 import ContainerPropsSchema, { ContainerProps } from '../../../../documents/blocks/Container/ContainerPropsSchema';
 
 import BaseSidebarPanel from './helpers/BaseSidebarPanel';
+import VisibilityInput from './helpers/inputs/VisibilityInput';
 import MultiStylePropertyPanel from './helpers/style-inputs/MultiStylePropertyPanel';
 
 type ContainerSidebarPanelProps = {
@@ -28,6 +29,10 @@ export default function ContainerSidebarPanel({ data, setData }: ContainerSideba
         names={['backgroundColor', 'borderColor', 'borderRadius', 'padding']}
         value={data.style}
         onChange={(style) => updateData({ ...data, style })}
+      />
+      <VisibilityInput
+        defaultValue={data.visibility}
+        onChange={(visibility) => updateData({ ...data, visibility })}
       />
     </BaseSidebarPanel>
   );
